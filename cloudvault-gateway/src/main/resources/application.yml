@@ -1,0 +1,74 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: cloudvault-gateway
+  profiles:
+    active: local-h2
+
+---
+# Local Profile - Routing without Redis dependencies
+spring:
+  config:
+    activate:
+      on-profile: local-h2
+  cloud:
+    gateway:
+      routes:
+        - id: auth-service
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/v1/auth/**
+        - id: core-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/v1/workspaces/**, /api/v1/folders/**, /api/v1/files/**
+        - id: transfer-service
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/v1/transfer/**
+
+---
+# Postgres / Production Profile - Routing with Redis Rate Limiting
+spring:
+  config:
+    activate:
+      on-profile: postgres
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  cloud:
+    gateway:
+      routes:
+        - id: auth-service
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/v1/auth/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+                key-resolver: "#{@userKeyResolver}"
+        - id: core-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/v1/workspaces/**, /api/v1/folders/**, /api/v1/files/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 20
+                redis-rate-limiter.burstCapacity: 40
+                key-resolver: "#{@userKeyResolver}"
+        - id: transfer-service
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/v1/transfer/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+                key-resolver: "#{@userKeyResolver}"

@@ -1,0 +1,29 @@
+# Maven Build Output
+target/
+*.class
+*.war
+*.ear
+*.jar
+
+# Node/React Output
+node_modules/
+dist/
+build/
+.npm
+.eslintcache
+
+# IDE Settings
+.idea/
+*.iml
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Logs and Temp
+*.log
+temp/
+tmp/
+.DS_Store

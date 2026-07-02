@@ -1,0 +1,71 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: cloudvault-auth
+  profiles:
+    active: local-h2
+
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+---
+# Local In-Memory Fallback Profile (No External Docker Services Required)
+spring:
+  config:
+    activate:
+      on-profile: local-h2
+  datasource:
+    url: jdbc:h2:mem:authdb;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  sql:
+    init:
+      mode: never
+
+cloudvault:
+  jwt:
+    secret: dGVzdHNlY3JldGtleWZvcmNsb3VkdmF1bHRlbnRlcnByaXNlYXV0aHNlcnZpY2V3aXRoZW5vdWdoYml0czI1Ng==
+    expiration-ms: 900000 # 15 mins
+    refresh-expiration-ms: 604800000 # 7 days
+
+---
+# PostgreSQL & Redis Profile (For Docker / Production)
+spring:
+  config:
+    activate:
+      on-profile: postgres
+  datasource:
+    url: jdbc:postgresql://localhost:5432/cloudvault
+    username: cloudvault_user
+    password: cloudvault_password
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+cloudvault:
+  jwt:
+    secret: dGVzdHNlY3JldGtleWZvcmNsb3VkdmF1bHRlbnRlcnByaXNlYXV0aHNlcnZpY2V3aXRoZW5vdWdoYml0czI1Ng==
+    expiration-ms: 900000
+    refresh-expiration-ms: 604800000
