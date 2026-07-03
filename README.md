@@ -7,6 +7,8 @@
 
 A secure, resilient, and collaborative cloud storage home for modern enterprise teams.
 
+Live Deployment: **[https://cloudvault-ui.vercel.app](https://cloudvault-ui.vercel.app)**
+
 ![CloudVault Dashboard Mockup](screenshots/cloudvault-dashboard.png)
 
 ---
