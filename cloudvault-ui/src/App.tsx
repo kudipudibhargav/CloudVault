@@ -1,16 +1,24 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { Navbar } from './components/Navbar';
 import { FileExplorer } from './components/FileExplorer';
 import { Collaborators } from './components/Collaborators';
 import { CommentsDrawer } from './components/CommentsDrawer';
+import { LandingPage } from './components/LandingPage';
+import { AuthScreens } from './components/AuthScreens';
+import { OnboardingWizard } from './components/OnboardingWizard';
+import { AnalyticsTab } from './components/AnalyticsTab';
+import { SecurityTab } from './components/SecurityTab';
+import { TrashTab } from './components/TrashTab';
+import { AiChatPanel } from './components/AiChatPanel';
 import { useCloudVaultStore } from './store/useCloudVaultStore';
 import { Info, CheckCircle2, AlertTriangle, X } from 'lucide-react';
 
 const App: React.FC = () => {
-  const { notification, dismissNotification } = useCloudVaultStore();
+  const { currentView, activeTab, notification, dismissNotification } = useCloudVaultStore();
+  const [isAiChatOpen, setIsAiChatOpen] = useState(false);
 
-  // Auto-dismiss notifications after 5 seconds
+  // Auto-dismiss notification banners
   useEffect(() => {
     if (notification) {
       const timer = setTimeout(() => {
@@ -26,6 +34,19 @@ const App: React.FC = () => {
     return <Info className="w-4 h-4 text-brand-400" />;
   };
 
+  // Render based on user view state
+  if (currentView === 'landing') {
+    return <LandingPage />;
+  }
+
+  if (currentView === 'login' || currentView === 'signup') {
+    return <AuthScreens />;
+  }
+
+  if (currentView === 'onboarding') {
+    return <OnboardingWizard />;
+  }
+
   return (
     <div className="flex h-screen w-screen bg-slate-950 overflow-hidden font-sans select-none antialiased">
       {/* Sidebar Navigation */}
@@ -33,9 +54,19 @@ const App: React.FC = () => {
 
       {/* Main Panel Viewport */}
       <div className="flex-1 flex flex-col min-w-0 bg-slate-950">
-        <Navbar />
+        <Navbar onToggleAiChat={() => setIsAiChatOpen(prev => !prev)} isAiChatOpen={isAiChatOpen} />
+        
         <div className="flex-1 flex min-h-0">
-          <FileExplorer />
+          {/* Active Tab Router */}
+          {activeTab === 'explorer' && <FileExplorer />}
+          {activeTab === 'analytics' && <AnalyticsTab />}
+          {activeTab === 'security' && <SecurityTab />}
+          {activeTab === 'trash' && <TrashTab />}
+
+          {/* AI Chat Assistant sidebar drawer */}
+          {isAiChatOpen && <AiChatPanel />}
+
+          {/* Active Collaborators presence list */}
           <Collaborators />
         </div>
       </div>

@@ -1,8 +1,13 @@
 import React from 'react';
 import { useCloudVaultStore } from '../store/useCloudVaultStore';
-import { Search, SlidersHorizontal, Home, ChevronRight } from 'lucide-react';
+import { Search, SlidersHorizontal, Home, ChevronRight, LogOut, Sparkles } from 'lucide-react';
 
-export const Navbar: React.FC = () => {
+interface NavbarProps {
+  onToggleAiChat: () => void;
+  isAiChatOpen: boolean;
+}
+
+export const Navbar: React.FC<NavbarProps> = ({ onToggleAiChat, isAiChatOpen }) => {
   const {
     folderPath,
     setCurrentFolder,
@@ -10,14 +15,19 @@ export const Navbar: React.FC = () => {
     setSearchQuery,
     filterMimeType,
     setFilterMimeType,
+    setView
   } = useCloudVaultStore();
 
   const handleBreadcrumbClick = (id: string | null) => {
     setCurrentFolder(id);
   };
 
+  const handleSignOut = () => {
+    setView('landing');
+  };
+
   return (
-    <header className="h-16 border-b border-slate-800/80 px-6 flex items-center justify-between bg-slate-950/20 backdrop-blur-md">
+    <header className="h-16 border-b border-slate-800/80 px-6 flex items-center justify-between bg-slate-950/20 backdrop-blur-md select-none shrink-0 z-30">
       {/* Path Breadcrumbs */}
       <div className="flex items-center gap-1.5 text-xs font-medium text-slate-400">
         <button
@@ -72,14 +82,27 @@ export const Navbar: React.FC = () => {
           </select>
         </div>
 
-        {/* WebSocket broadcast node status */}
-        <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-950/20 border border-emerald-900/30 rounded-xl select-none">
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-          </span>
-          <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider">WS SYNCED</span>
-        </div>
+        {/* AI chat assistant toggle */}
+        <button
+          onClick={onToggleAiChat}
+          className={`p-2 rounded-xl border transition-all flex items-center justify-center ${
+            isAiChatOpen
+              ? 'bg-brand-600/15 border-brand-500/35 text-brand-400'
+              : 'bg-slate-900/40 border-slate-850 text-slate-450 hover:text-white hover:border-slate-700'
+          }`}
+          title="Toggle AI Chat Assistant"
+        >
+          <Sparkles className="w-4 h-4" />
+        </button>
+
+        {/* Sign Out */}
+        <button
+          onClick={handleSignOut}
+          className="p-2 rounded-xl bg-slate-900/40 border border-slate-850 text-slate-500 hover:text-rose-400 hover:border-rose-900/30 transition-all flex items-center justify-center"
+          title="Sign Out"
+        >
+          <LogOut className="w-4 h-4" />
+        </button>
       </div>
     </header>
   );
