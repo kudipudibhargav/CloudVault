@@ -2,10 +2,34 @@ import React, { useState } from 'react';
 import { useCloudVaultStore } from '../store/useCloudVaultStore';
 import { motion } from 'framer-motion';
 import { Cloud, Shield, Zap, Sparkles, ArrowRight, Check, Play, Users } from 'lucide-react';
+import { Sidebar } from './Sidebar';
+import { Navbar } from './Navbar';
+import { FileExplorer } from './FileExplorer';
+import { Collaborators } from './Collaborators';
+import { AnalyticsTab } from './AnalyticsTab';
+import { SecurityTab } from './SecurityTab';
+import { TrashTab } from './TrashTab';
+import { AiChatPanel } from './AiChatPanel';
 
 export const LandingPage: React.FC = () => {
-  const { setView } = useCloudVaultStore();
+  const { setView, activeTab } = useCloudVaultStore();
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
+  const [showAiChat, setShowAiChat] = useState(false);
+
+  // Set currentUser mock for landing page sandbox so profile renders cleanly
+  const store = useCloudVaultStore();
+  React.useEffect(() => {
+    if (!store.currentUser) {
+      useCloudVaultStore.setState({
+        currentUser: {
+          id: 'user-1',
+          name: 'Aditya Kudipudi',
+          email: 'aditya@cloudvault.com',
+          avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=80&fit=crop&q=80'
+        }
+      });
+    }
+  }, [store.currentUser]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -109,32 +133,49 @@ export const LandingPage: React.FC = () => {
               <ArrowRight className="w-4 h-4 text-slate-950" />
             </button>
             <button
-              onClick={() => setView('login')}
+              onClick={() => {
+                const element = document.getElementById('sandbox-dashboard');
+                element?.scrollIntoView({ behavior: 'smooth' });
+              }}
               className="flex items-center gap-2 px-6 py-3 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-xs font-bold text-slate-200 transition-all duration-200"
             >
               <Play className="w-4 h-4 opacity-75" />
-              Watch Demo
+              Try Live Demo
             </button>
           </motion.div>
 
-          {/* Interactive Preview Dashboard Mockup */}
+          {/* Interactive Live Sandbox Dashboard Mockup */}
           <motion.div
+            id="sandbox-dashboard"
             variants={itemVariants}
-            className="w-full max-w-5xl mt-12 p-3 rounded-3xl bg-slate-950/60 border border-slate-800/80 shadow-2xl relative"
+            className="w-full max-w-5xl mt-12 p-1.5 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl relative"
           >
             <div className="absolute inset-0 bg-brand-500/5 blur-3xl pointer-events-none -z-10" />
-            <div className="rounded-2xl overflow-hidden border border-slate-800 bg-slate-900/40 relative aspect-[16/9] flex items-center justify-center">
-              <div className="absolute top-4 left-4 flex gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-rose-500/80" />
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
-              </div>
-              <div className="text-center p-8 flex flex-col items-center gap-4 max-w-sm">
-                <div className="p-3 bg-brand-600/10 rounded-2xl border border-brand-500/25">
-                  <Cloud className="w-8 h-8 text-brand-400" />
+            <div className="absolute -top-3 left-6 px-3 py-1 rounded bg-brand-600 text-[8px] font-bold uppercase tracking-wider text-white select-none z-10 animate-bounce">
+              Live Sandbox Preview (No login required)
+            </div>
+
+            <div className="rounded-2xl overflow-hidden border border-slate-800 bg-slate-950 h-[580px] flex flex-col relative text-left">
+              {/* Core App Layout inside the frame */}
+              <div className="flex-1 flex min-h-0">
+                <Sidebar />
+                <div className="flex-1 flex flex-col min-w-0 bg-slate-950">
+                  <Navbar onToggleAiChat={() => setShowAiChat(prev => !prev)} isAiChatOpen={showAiChat} />
+                  
+                  <div className="flex-1 flex min-h-0 relative">
+                    {/* Active tab route */}
+                    {activeTab === 'explorer' && <FileExplorer />}
+                    {activeTab === 'analytics' && <AnalyticsTab />}
+                    {activeTab === 'security' && <SecurityTab />}
+                    {activeTab === 'trash' && <TrashTab />}
+
+                    {/* AI collapsible panel */}
+                    {showAiChat && <AiChatPanel />}
+
+                    {/* Team Presence */}
+                    <Collaborators />
+                  </div>
                 </div>
-                <h4 className="text-sm font-bold text-white">Click "Start Free Trial" to explore the live dashboard portal.</h4>
-                <p className="text-xs text-slate-500">Includes live image uploads, folder creation, version rollbacks, comments, and AI search tools.</p>
               </div>
             </div>
           </motion.div>
