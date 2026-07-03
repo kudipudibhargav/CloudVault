@@ -151,9 +151,6 @@ export const LandingPage: React.FC = () => {
             className="w-full max-w-5xl mt-12 p-1.5 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl relative"
           >
             <div className="absolute inset-0 bg-brand-500/5 blur-3xl pointer-events-none -z-10" />
-            <div className="absolute -top-3 left-6 px-3 py-1 rounded bg-brand-600 text-[8px] font-bold uppercase tracking-wider text-white select-none z-10 animate-bounce">
-              Live Sandbox Preview (No login required)
-            </div>
 
             <div className="rounded-2xl overflow-hidden border border-slate-800 bg-slate-950 h-[580px] flex flex-col relative text-left">
               {/* Core App Layout inside the frame */}

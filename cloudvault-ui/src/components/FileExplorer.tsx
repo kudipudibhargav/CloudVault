@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useCloudVaultStore, type FileModel } from '../store/useCloudVaultStore';
+import { motion } from 'framer-motion';
 import {
   Folder,
   File,
@@ -158,9 +159,14 @@ export const FileExplorer: React.FC = () => {
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {folders.map(folder => (
-              <div
+              <motion.div
                 key={folder.id}
                 onClick={() => setCurrentFolder(folder.id)}
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ duration: 0.2 }}
                 className="p-4 rounded-2xl glass-panel glass-panel-hover transition-all cursor-pointer flex items-center gap-3.5 group"
               >
                 <Folder className="w-6 h-6 text-brand-400 group-hover:scale-105 transition-transform" />
@@ -168,7 +174,7 @@ export const FileExplorer: React.FC = () => {
                   <span className="text-xs font-semibold text-slate-200 truncate w-36">{folder.name}</span>
                   <span className="text-[9px] text-slate-500 font-medium">Workspace Folder</span>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -202,8 +208,14 @@ export const FileExplorer: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/40 text-xs text-slate-350">
-                {filteredFiles.map(file => (
-                  <tr key={file.id} className="hover:bg-slate-900/30 transition-colors">
+                {filteredFiles.map((file, i) => (
+                  <motion.tr
+                    key={file.id}
+                    initial={{ y: 8, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: i * 0.04, duration: 0.35, ease: 'easeOut' }}
+                    className="hover:bg-slate-900/30 transition-colors"
+                  >
                     {/* File Identity */}
                     <td 
                       className="p-4 flex items-center gap-3 cursor-pointer group/cell"
@@ -295,7 +307,7 @@ export const FileExplorer: React.FC = () => {
                         </button>
                       </div>
                     </td>
-                  </tr>
+                  </motion.tr>
                 ))}
               </tbody>
             </table>
